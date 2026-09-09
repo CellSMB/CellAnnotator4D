@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import Path
 
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from . import __version__
 from .main_window import MainWindow
@@ -199,8 +199,9 @@ def main(argv: list[str] | None = None) -> int:
     if arguments.disable_3d:
         os.environ["CHRONOPOSE_VIEWER_DISABLE_3D"] = "1"
     QtCore.QCoreApplication.setOrganizationName("Chronopose")
-    QtCore.QCoreApplication.setApplicationName("Chronopose Viewer")
+    QtCore.QCoreApplication.setApplicationName("CellAnnotator4D")
     application = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
+    application.setWindowIcon(QtGui.QIcon(str(Path(__file__).with_name("assets") / "icon.svg")))
     application.setStyle("Fusion")
     window = MainWindow(arguments.path)
     window.show()
