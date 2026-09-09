@@ -1,9 +1,15 @@
-# Chronopose Viewer
+# CellAnnotator4D
 
-Chronopose Viewer is a standalone Python/Qt application for annotating arbitrary
+CellAnnotator4D is a standalone Python/Qt application for annotating arbitrary
 3D centreline instance graphs in `TZYX` TIFF time series and recording
 many-to-many lineage relationships between instances. It is deliberately not a
 napari plugin and does not import or modify napari.
+
+The application has been renamed in this documentation. For now, the package,
+executable, and micromamba environment are still named `chronopose-viewer`,
+the Python module is `chronopose_viewer`, and projects still use `.cpv.json`.
+The current application window and dialogs also retain the previous name.
+Use the existing technical names in the commands below.
 
 ## Environment
 
@@ -24,6 +30,10 @@ micromamba run -n chronopose-viewer python -m pip install -e . --no-deps --no-bu
 
 No system packages or global Python packages are required.
 
+The commands below use `micromamba run` explicitly. Alternatively, activate the
+environment with `micromamba activate chronopose-viewer` before running the
+shorter commands that start with `chronopose-viewer`.
+
 ## Run
 
 ```bash
@@ -31,6 +41,16 @@ micromamba run -n chronopose-viewer chronopose-viewer
 micromamba run -n chronopose-viewer chronopose-viewer path/to/volume.tif
 micromamba run -n chronopose-viewer chronopose-viewer path/to/annotations.cpv.json
 ```
+
+To run without the OpenGL 3D pane, use:
+
+```bash
+micromamba run -n chronopose-viewer chronopose-viewer --disable-3d path/to/volume.tif
+```
+
+This still opens the Qt application with its 2D panes. `--help` lists launch
+options, and `--version` prints the installed version. Each conversion command
+also accepts `--help`.
 
 TIFF data are expected to be `TZYX`; a single `ZYX` volume is accepted as a
 one-frame series. When TIFF metadata contains extra singleton axes they are
@@ -42,9 +62,15 @@ Annotation projects are small JSON files. The source TIFF path is stored
 relative to the project where possible, so the TIFF and project can be moved
 together.
 
+Use **File → Save** (`Ctrl+S`) to save annotations, or **File → Save as…** to
+choose another project path. The first save prompts for a `.cpv.json` file,
+defaulting to the source image's name and directory. Reopen it with
+**File → Open project…** (`Ctrl+Shift+O`). Projects reference the source TIFF;
+they do not embed its image data.
+
 ## Convert inference outputs
 
-Finalized Chronopose inference directories can be converted directly into
+Finalized inference directories can be converted directly into
 editable centreline projects:
 
 ```bash
@@ -58,6 +84,11 @@ tracked 3D mask is thinned to a centreline graph, track IDs and colours remain
 stable between frames, and the JSON observation links become 1–1, fission,
 fusion, start, and end events. The project is written beside the output image
 as `<image-name>.cpv.json`.
+
+Directory discovery is recursive. The input may also be an individual output
+TIFF, `_cp_masks` TIFF, `_lineage.json`, or `finalize_manifest.json`. The files
+must follow the converter's expected tracked-mask and observation-link schema;
+arbitrary segmentation TIFFs alone are not sufficient.
 
 Existing project files are always skipped, so rerunning the command does not
 replace prior conversion or editing work. Pass physical voxel spacing when it
@@ -114,6 +145,12 @@ chronopose-viewer radii-from-masks sample.cpv.json --scale 1.1 --offset -0.25
 chronopose-viewer radii-from-masks sample.cpv.json --only-zero
 ```
 
+The defaults are scale 1, offset 0, and maximum search distance 3 voxels.
+The resulting radius is `max(0, (measured_radius + offset) * scale)`.
+Nodes that cannot be associated with a mask component are reset to zero and
+reported as unmatched. With `--only-zero`, existing non-zero radii are preserved
+before mask matching is attempted.
+
 ## Annotation workflow
 
 1. Open a `TZYX` TIFF with **File → Open TIFF**.
@@ -167,6 +204,12 @@ available from every tab:
 - the mouse wheel zooms;
 - Shift + mouse wheel steps through the hovered 2D pane's slice axis.
 
+For precise node placement, select a node, edit its Z, Y, and X values under
+**Edit graph → Selected node position (ZYX)**, then click **Apply position**.
+Coordinates use zero-based voxel indices and accept fractional positions.
+The selected node's radius is displayed below these fields; use tool 11 to
+change it.
+
 Items compatible with the current edit tool glow on hover, previewing what a
 left click will affect. Node state remains readable when states overlap:
 selection is a cyan ring, the tool 2, tool 4, or tool 9 source is magenta, and
@@ -186,9 +229,11 @@ step. Cursor and slice navigation, 2D and 3D camera movement, contrast,
 overlay opacity/visibility, active tool, and hover are not added to history.
 Undoing back to the last save point also clears the unsaved-change marker.
 
-In **Instances**, **Copy to previous** and **Copy to next** create a new
-instance on the adjacent frame with identical positions and topology but fresh
-instance and node IDs. Copying does not create a lineage event automatically.
+In **Instances**, the **Name** field renames the active instance and **Delete**
+removes it. **Copy to previous** and **Copy to next** create a new
+instance on the adjacent frame with identical positions, topology, radii,
+name, and colour but fresh instance and node IDs. Copying does not create a
+lineage event automatically.
 When instances are joined, compatible lineage events are consolidated and an
 operation with contradictory source/target frames is refused without changing
 either graph. Splitting an instance adds both resulting instances to its
@@ -246,8 +291,10 @@ timepoint's graph geometry or colours change.
 ## Node-radius volumes
 
 Every graph node stores one non-negative radius in voxel-coordinate units.
-Older projects load with radius zero, and new nodes also start at zero, which
-means off. Connected non-zero nodes are rendered as the filled union of their
+Nodes in older projects that lack a radius field load with radius zero, which
+means off. Newly placed nodes start at zero; splitting an edge interpolates
+the new node's radius from its endpoints, and copying an instance preserves
+its node radii. Connected non-zero nodes are rendered as the filled union of their
 balls and a linearly changing swept-ball envelope along each edge. This forms
 a continuous tapered worm while retaining arbitrary branches, loops, and
 disconnected components. The true cross-section is shown in each 2D slice and
@@ -256,7 +303,7 @@ a downsampled categorical volume is shown in 3D.
 In **Opacity → Node radii**, the connected fill and independent node circles
 each have their own **All**, **Selected**, and **None** control. All displays
 every current-frame instance; Selected restricts that layer to the active
-mitochondrion; None hides it. The node-circle layer draws a black-backed thin
+instance; None hides it. The node-circle layer draws a black-backed thin
 white circle for every individual node sphere intersecting each slice, without
 connecting neighbouring nodes. In 3D, those radii remain transparent,
 camera-facing 2D circles centred on their nodes instead of becoming white
@@ -275,9 +322,10 @@ rerunnable in-app alternative for bright tubular signal. Choose a boundary
 level between local background and centre intensity, a maximum radius, the
 radial-ray percentile, and radial smoothing, then apply the estimate to the
 active instance or every graph at the current timepoint. Each run is one
-undoable edit. The conservative default 10th ray percentile was calibrated
-against the mask-derived radii in the supplied `10000` example; different
-imaging conditions can be tuned and rerun without restarting the viewer.
+undoable edit. Defaults are a 50% boundary level, a maximum radius of 15 voxels,
+the 10th ray percentile, and radial smoothing of 0.75 voxels. Tune these for your
+imaging conditions and rerun without restarting the viewer. Example image
+datasets are not included in this repository.
 
 ## Lineage events
 
