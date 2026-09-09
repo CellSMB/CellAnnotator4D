@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
     if arguments.disable_3d:
         os.environ["CHRONOPOSE_VIEWER_DISABLE_3D"] = "1"
     QtCore.QCoreApplication.setOrganizationName("Chronopose")
-    QtCore.QCoreApplication.setApplicationName("Chronopose Viewer")
+    QtCore.QCoreApplication.setApplicationName("CellAnnotator4D")
     application = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
     application.setStyle("Fusion")
     window = MainWindow(arguments.path)

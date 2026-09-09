@@ -5,11 +5,16 @@ CellAnnotator4D is a standalone Python/Qt application for annotating arbitrary
 many-to-many lineage relationships between instances. It is deliberately not a
 napari plugin and does not import or modify napari.
 
-The application has been renamed in this documentation. For now, the package,
-executable, and micromamba environment are still named `chronopose-viewer`,
-the Python module is `chronopose_viewer`, and projects still use `.cpv.json`.
-The current application window and dialogs also retain the previous name.
-Use the existing technical names in the commands below.
+## Download and install
+
+Download unsigned Windows installers and macOS DMGs from
+[GitHub Releases](https://github.com/CellSMB/CellAnnotator4D/releases).
+See [installation instructions](packaging/INSTALL.md) for choosing your download
+and opening an unsigned application. Python is not needed for desktop downloads.
+
+The desktop application is named CellAnnotator4D. The Python package, CLI, and
+micromamba environment remain `chronopose-viewer`, the module is
+`chronopose_viewer`, and projects still use `.cpv.json`.
 
 ## Environment
 
@@ -358,6 +363,11 @@ matching cost based on physical position, length, extent, and topology, while
 leaving all existing connections and START/END markers untouched.
 
 ## Development
+
+For self-contained Windows/macOS desktop builds, see
+[Desktop bundles](packaging/README.md). The PyInstaller configuration bundles
+Python, Qt, and the scientific dependencies. GitHub Actions builds unsigned
+Windows installers and macOS DMGs, and creates draft releases for version tags.
 
 ```bash
 micromamba run -n chronopose-viewer pytest

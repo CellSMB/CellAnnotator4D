@@ -197,13 +197,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.undo_stack.setUndoLimit(100)
         self.undo_stack.cleanChanged.connect(self._undo_clean_changed)
 
-        self.setWindowTitle("Chronopose Viewer")
+        self.setWindowTitle("CellAnnotator4D")
         self.resize(1540, 980)
         self.setAcceptDrops(True)
         self._build_actions()
         self._build_ui()
         self._set_project_controls_enabled(False)
-        self.statusBar().showMessage("Open a TZYX TIFF or Chronopose Viewer project")
+        self.statusBar().showMessage("Open a TZYX TIFF or CellAnnotator4D project")
 
         if initial_path is not None:
             QtCore.QTimer.singleShot(0, lambda: self.open_path(initial_path))
@@ -892,9 +892,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def choose_project(self) -> None:
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self,
-            "Open Chronopose Viewer project",
+            "Open CellAnnotator4D project",
             "",
-            "Chronopose Viewer projects (*.cpv.json *.json);;All files (*)",
+            "CellAnnotator4D projects (*.cpv.json *.json);;All files (*)",
         )
         if path:
             self.open_annotation_project(path)
@@ -1148,9 +1148,9 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self,
-            "Save Chronopose Viewer project",
+            "Save CellAnnotator4D project",
             str(suggested),
-            "Chronopose Viewer projects (*.cpv.json)",
+            "CellAnnotator4D projects (*.cpv.json)",
         )
         if not path:
             return False
@@ -2730,9 +2730,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _update_dirty_state(self, dirty: bool) -> None:
         self.dirty = dirty
-        source_name = self.volume.path.name if self.volume is not None else "Chronopose Viewer"
+        source_name = self.volume.path.name if self.volume is not None else "CellAnnotator4D"
         project_name = self.project_path.name if self.project_path is not None else source_name
-        self.setWindowTitle(f"{'*' if dirty else ''}{project_name} — Chronopose Viewer")
+        self.setWindowTitle(f"{'*' if dirty else ''}{project_name} — CellAnnotator4D")
 
     def _set_dirty(self, dirty: bool) -> None:
         """Set the save point; retained as a small compatibility helper for callers/tests."""
