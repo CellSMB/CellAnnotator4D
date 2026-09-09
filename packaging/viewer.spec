@@ -12,8 +12,13 @@ from PyInstaller.utils.hooks import (
 )
 
 root = Path(SPECPATH).parent
+sys.path.insert(0, str(root / "packaging"))
+from build_icon import build_icon
+
+icon = str(build_icon(root, sys.platform)) if sys.platform in {"win32", "darwin"} else None
 version = tomllib.loads((root / "pyproject.toml").read_text())["project"]["version"]
 datas = [(str(root / "LICENSE"), "licenses/chronopose-viewer")]
+datas += [(str(root / "src/chronopose_viewer/assets/icon.svg"), "chronopose_viewer/assets")]
 binaries = []
 hiddenimports = [
     "PySide6.QtCore", "PySide6.QtGui", "PySide6.QtWidgets",
@@ -68,6 +73,7 @@ exe = EXE(
     pyz, a.scripts, [],
     exclude_binaries=True,
     name="CellAnnotator4D",
+    icon=icon,
     console=False,
     strip=False,
     upx=False,
@@ -83,6 +89,7 @@ if sys.platform == "darwin":
     app = BUNDLE(
         bundle,
         name="CellAnnotator4D.app",
+        icon=icon,
         bundle_identifier="org.cellannotator4d.viewer",
         version=version,
         info_plist={

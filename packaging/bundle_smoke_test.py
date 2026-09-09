@@ -26,7 +26,7 @@ def main(argv: list[str]) -> int:
 
         import numpy as np
         from OpenGL import GL
-        from PySide6 import QtWidgets
+        from PySide6 import QtGui, QtWidgets
         from scipy.ndimage import distance_transform_edt
         from skimage.morphology import skeletonize
         import tifffile
@@ -35,6 +35,7 @@ def main(argv: list[str]) -> int:
         from chronopose_viewer.io import load_project, load_tiff, save_project
         from chronopose_viewer.main_window import MainWindow
         from chronopose_viewer.model import GraphProject
+        import chronopose_viewer
 
         assert callable(GL.glGetString)
         assert app.use_app().backend_name.lower() == "pyside6"
@@ -45,6 +46,10 @@ def main(argv: list[str]) -> int:
         assert skeletonize(volume[0] > 0).any()
         report["checks"].append("SciPy distance transform / scikit-image skeletonization")
         application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+        icon = QtGui.QIcon(str(Path(chronopose_viewer.__file__).with_name("assets") / "icon.svg"))
+        assert not icon.pixmap(64, 64).isNull(), "App icon resource is missing"
+        application.setWindowIcon(icon)
+        report["checks"].append("App icon / Qt SVG plugin")
         with tempfile.TemporaryDirectory(prefix="cellannotator-bundle-") as directory:
             directory = Path(directory)
             for compression in ("deflate", "lzw", "zstd"):

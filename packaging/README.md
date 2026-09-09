@@ -114,8 +114,8 @@ location). macOS uses the built-in `hdiutil` and `ditto` tools. To repackage an
 existing bundle, add `--package-only`. Output is in `dist/installers/`, including
 SHA-256 checksums, a dependency manifest, and installation instructions.
 
-The GitHub workflow `.github/workflows/desktop.yml` runs on main, packaging
-branches, pull requests, version tags, and manual dispatch. It uses Windows x64,
+The GitHub workflow `.github/workflows/desktop.yml` runs on main,
+pull requests, version tags, and manual dispatch. It uses Windows x64,
 macOS ARM64, and macOS Intel runners. It installs the dependency baseline in
 `packaging/constraints.txt`, builds and checks installers, and runs the test
 suite. Download test installers from the workflow run's `unsigned-*` artifacts;

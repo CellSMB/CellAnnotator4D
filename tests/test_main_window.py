@@ -539,7 +539,12 @@ def test_right_clicking_2d_background_moves_crosshair_from_any_tab(qtbot) -> Non
         QtCore.Qt.MouseButton.RightButton,
     )
 
-    assert window.cursor_zyx == (1.0, 0.0, 5.0)
+    # QTest clicks integer screen pixels; the data-to-screen transform differs
+    # with platform font metrics and display scaling. Background navigation is
+    # continuous, so allow one screen pixel rather than expecting voxel snapping.
+    pixel_size = max(abs(value) for value in window.ortho_views[Plane.XY].view_box.viewPixelSize())
+    assert window.cursor_zyx[0] == 1.0
+    assert window.cursor_zyx[1:] == pytest.approx((0.0, 5.0), abs=pixel_size)
     assert window.ortho_views[Plane.XY].slice_index == 1
     assert window.ortho_views[Plane.XZ].slice_index == 0
     assert window.ortho_views[Plane.YZ].slice_index == 5

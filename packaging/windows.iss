@@ -23,6 +23,7 @@ OutputBaseFilename=CellAnnotator4D-{#AppVersion}-windows-x64-setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile={#RepoRoot}\build\icons\CellAnnotator4D.ico
 LicenseFile={#RepoRoot}\LICENSE
 CloseApplications=yes
 SetupLogging=yes
