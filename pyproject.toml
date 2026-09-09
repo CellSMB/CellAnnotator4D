@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chronopose-viewer"
+version = "0.5.2"
+description = "Standalone Qt editor for 3D instance graphs and lineage events in TZYX TIFF data"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "PySide6>=6.7",
+  "pyqtgraph>=0.13.7",
+  "vispy>=0.14.3",
+  "PyOpenGL>=3.1.7",
+  "tifffile>=2024.2",
+  "imagecodecs>=2024.1",
+  "scikit-image>=0.25,<0.27",
+  "scipy>=1.12",
+]
+
+[project.scripts]
+chronopose-viewer = "chronopose_viewer.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chronopose_viewer"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
