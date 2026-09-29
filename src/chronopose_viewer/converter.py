@@ -628,8 +628,11 @@ def _populate_pca_fallback(graph: InstanceGraph, coordinates: np.ndarray) -> Non
     eigenvalues, eigenvectors = np.linalg.eigh(covariance)
     axis = eigenvectors[:, int(np.argmax(eigenvalues))]
     projections = centred @ axis
-    first_position = centre + float(projections.min()) * axis
-    last_position = centre + float(projections.max()) * axis
+    # Extreme projections can fall outside the mask (and the volume) for masks at an edge.
+    lower = coordinates.min(axis=0).astype(np.float64)
+    upper = coordinates.max(axis=0).astype(np.float64)
+    first_position = np.clip(centre + float(projections.min()) * axis, lower, upper)
+    last_position = np.clip(centre + float(projections.max()) * axis, lower, upper)
     first = graph.add_node(first_position, node_id=_next_node_id(graph))
     if np.linalg.norm(last_position - first_position) < 1e-8:
         return
