@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chronopose-viewer"
-version = "0.5.3"
+version = "0.5.4"
 description = "Standalone Qt editor for 3D instance graphs and lineage events in TZYX TIFF data"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -3,4 +3,4 @@
 from .model import GraphProject, InstanceGraph, LineageEvent
 
 __all__ = ["GraphProject", "InstanceGraph", "LineageEvent"]
-__version__ = "0.5.3"
+__version__ = "0.5.4"
